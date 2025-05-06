@@ -131,10 +131,10 @@ app.post("/send-email", async (req, res) => {
   console.log(email);
   console.log(products);
 
- // Function to transform raw product data into the expected schema format
+  // Function to transform raw product data into the expected schema format
 
 
- 
+
 
 
   const transporter = nodemailer.createTransport({
@@ -151,78 +151,78 @@ app.post("/send-email", async (req, res) => {
   doc.pipe(passThroughStream);
 
   // Generate a random invoice number
-const generateRandomInvoiceNumber = () => {
-  const randomNum = Math.floor(Math.random() * 1000000); // Generates a number between 0 and 999999
-  return `INV-${randomNum.toString().padStart(6, '0')}`; // Format with leading zeros
-};
+  const generateRandomInvoiceNumber = () => {
+    const randomNum = Math.floor(Math.random() * 1000000); // Generates a number between 0 and 999999
+    return `INV-${randomNum.toString().padStart(6, '0')}`; // Format with leading zeros
+  };
 
-// Use the function to generate a random invoice number
-const invoiceNumber = generateRandomInvoiceNumber();
+  // Use the function to generate a random invoice number
+  const invoiceNumber = generateRandomInvoiceNumber();
 
-   // PDF content with additional details
-// Generate the PDF content
-doc.fontSize(12);
+  // PDF content with additional details
+  // Generate the PDF content
+  doc.fontSize(12);
 
-// SPK Store Logo
-doc.image("images/spklogo.jpeg", 50, 45, { width: 100 }).moveDown();
+  // SPK Store Logo
+  doc.image("images/spklogo.jpeg", 50, 45, { width: 100 }).moveDown();
 
-// Store Information
-doc.font("Helvetica-Bold").text("SPK STORE", 200, 50, { align: "right" });
-doc.font("Helvetica").text(`Invoice # ${invoiceNumber}`, 200, 65, { align: "right" });
-doc.font("Helvetica").text(`Track Id # ${ inputValue}`, 200, 80, { align: "right" });
-doc.text(`Date: ${new Date().toLocaleDateString()}`, 200, 95, { align: "right" });
-doc.text(`Payment Method: ${paymentMethod}`, 200, 110, { align: "right" });
+  // Store Information
+  doc.font("Helvetica-Bold").text("SPK STORE", 200, 50, { align: "right" });
+  doc.font("Helvetica").text(`Invoice # ${invoiceNumber}`, 200, 65, { align: "right" });
+  doc.font("Helvetica").text(`Track Id # ${inputValue}`, 200, 80, { align: "right" });
+  doc.text(`Date: ${new Date().toLocaleDateString()}`, 200, 95, { align: "right" });
+  doc.text(`Payment Method: ${paymentMethod}`, 200, 110, { align: "right" });
 
-// Billing and Shipping Information
-doc.moveDown().moveDown();
-doc.font("Helvetica-Bold").text("Ship To:", 50, 200);
-doc.font("Helvetica").text(`${firstName} ${lastName}`, 50, 215);
-doc.text(`${shippingAddress}`, 50, 230);
-doc.text(`${contactNumber}`, 50, 245) // Add phone number
-
-
-// Items Table Header
-doc.moveDown().moveDown();
-doc.rect(50, 280, 500, 20).fillColor("#000000").fill();  // Black background for the header
-doc.fillColor("white").font("Helvetica-Bold").text("Item", 55, 283);
-doc.text("Quantity", 250, 283);
-doc.text("Rate", 350, 283);
-doc.text("Amount", 450, 283);
-
-//  const arr = JSON.parse(products);
-
-// const flattenedProducts = arr;
-// console.log(typeof flattenedProducts);
-let currentY = 310;  // Starting Y positio
-
-products.filter(prod => prod && prod.itemID).forEach((product) => {
-  const { itemName, quantity, priceAfterDiscount } = product;  // Correct destructuring
-  console.log(itemName + quantity + priceAfterDiscount)
-  console.log(product)
-  doc.fillColor("black").font("Helvetica").text(itemName, 55, currentY);
-  doc.text(quantity, 250, currentY);
-  doc.text(priceAfterDiscount, 350, currentY);
-  doc.text(`${parseFloat(priceAfterDiscount) * parseInt(quantity)}`, 450, currentY);
-  currentY += 30;
-});
+  // Billing and Shipping Information
+  doc.moveDown().moveDown();
+  doc.font("Helvetica-Bold").text("Ship To:", 50, 200);
+  doc.font("Helvetica").text(`${firstName} ${lastName}`, 50, 215);
+  doc.text(`${shippingAddress}`, 50, 230);
+  doc.text(`${contactNumber}`, 50, 245) // Add phone number
 
 
-// Summary Section
-doc.moveDown().moveDown();
-doc.text(`Total: ${orderTotal}`, 400, 370);
-doc.text(`Delivery cost: ${deliveryCost}`, 400, 385);
-//doc.rect(395, 395, doc.widthOfString(`Balance Due: ${balanceDue}`) + 10, 20).fillAndStroke("#000", "#000").fillColor("#FFF").fontSize(12).font("Helvetica-Bold").text(`Balance Due: ${balanceDue}`, 400, 400);
+  // Items Table Header
+  doc.moveDown().moveDown();
+  doc.rect(50, 280, 500, 20).fillColor("#000000").fill();  // Black background for the header
+  doc.fillColor("white").font("Helvetica-Bold").text("Item", 55, 283);
+  doc.text("Quantity", 250, 283);
+  doc.text("Rate", 350, 283);
+  doc.text("Amount", 450, 283);
+
+  //  const arr = JSON.parse(products);
+
+  // const flattenedProducts = arr;
+  // console.log(typeof flattenedProducts);
+  let currentY = 310;  // Starting Y positio
+
+  products.filter(prod => prod && prod.itemID).forEach((product) => {
+    const { itemName, quantity, priceAfterDiscount } = product;  // Correct destructuring
+    console.log(itemName + quantity + priceAfterDiscount)
+    console.log(product)
+    doc.fillColor("black").font("Helvetica").text(itemName, 55, currentY);
+    doc.text(quantity, 250, currentY);
+    doc.text(priceAfterDiscount, 350, currentY);
+    doc.text(`${parseFloat(priceAfterDiscount) * parseInt(quantity)}`, 450, currentY);
+    currentY += 30;
+  });
 
 
-// Notes and Terms
-doc.moveDown().moveDown();
-doc.font("Helvetica-Bold").text("Notes:", 50, 450);
-doc.font("Helvetica").text("Thanks for buying our product.", 50, 465);
+  // Summary Section
+  doc.moveDown().moveDown();
+  doc.text(`Total: ${orderTotal}`, 400, 370);
+  doc.text(`Delivery cost: ${deliveryCost}`, 400, 385);
+  //doc.rect(395, 395, doc.widthOfString(`Balance Due: ${balanceDue}`) + 10, 20).fillAndStroke("#000", "#000").fillColor("#FFF").fontSize(12).font("Helvetica-Bold").text(`Balance Due: ${balanceDue}`, 400, 400);
 
-doc.font("Helvetica-Bold").text("Terms:", 50, 490);
-doc.font("Helvetica").text("This warranty is valid for manufacturing defects only. We do not take any responsibility for the effects caused by external factors.", 50, 505, { width: 500 });
 
-doc.end();
+  // Notes and Terms
+  doc.moveDown().moveDown();
+  doc.font("Helvetica-Bold").text("Notes:", 50, 450);
+  doc.font("Helvetica").text("Thanks for buying our product.", 50, 465);
+
+  doc.font("Helvetica-Bold").text("Terms:", 50, 490);
+  doc.font("Helvetica").text("This warranty is valid for manufacturing defects only. We do not take any responsibility for the effects caused by external factors.", 50, 505, { width: 500 });
+
+  doc.end();
 
   // Email options
   // Email options
@@ -258,15 +258,15 @@ doc.end();
 //refuse email starts here
 // Route to send refusal email
 app.post("/refuse-email", async (req, res) => {
-  
+
 
   const { email } = req.body;  // Ensure email is being sent in req.body
   console.log(email);
-  
+
   if (!email) {
     return res.status(400).json({ message: "Email is required" });
   }
-  
+
 
 
 
@@ -278,8 +278,8 @@ app.post("/refuse-email", async (req, res) => {
     },
   });
 
-   //the refuse mail content
-   const mailOptions = {
+  //the refuse mail content
+  const mailOptions = {
     from: process.env.EMAIL_USER, // Use environment variable for sender email
     //this should be user's email
     to: email,
@@ -321,24 +321,24 @@ app.post("/refuse-email", async (req, res) => {
 
 
 
-  //sending notify email starts here
+//sending notify email starts here
 app.post("/notify-order", async (req, res) => {
   // console.log( " ======== = = "+req.body + " ===== ==== === === ");
-  
+
   const { to, subject, message, qty, prods } = req.body;
-  console.log("==== req.body prods ==== "+ req.body.prods);         
-  console.log("==== req.body prods ==== "+ typeof req.body.prods);         
-  console.log("==== req.body msg ==== "+ req.body.message);         
-  console.log("==== req.body subject ==== "+ req.body.subject);         
-       
+  console.log("==== req.body prods ==== " + req.body.prods);
+  console.log("==== req.body prods ==== " + typeof req.body.prods);
+  console.log("==== req.body msg ==== " + req.body.message);
+  console.log("==== req.body subject ==== " + req.body.subject);
+
   let jsonString = JSON.stringify(prods);
   console.log(jsonString);
-  console.log("========= string ======= "+ typeof+ jsonString);
-  
-  // Convert it back to a JSON object
-let jsonObject = JSON.parse(jsonString);
+  console.log("========= string ======= " + typeof + jsonString);
 
-  console.log("orderNO: "+jsonObject.orderNo);
+  // Convert it back to a JSON object
+  let jsonObject = JSON.parse(jsonString);
+
+  console.log("orderNO: " + jsonObject.orderNo);
 
   // jsonObject.products.filter(prod => prod && prod.itemID).forEach((product) => {
   //   const { itemName, quantity, priceAfterDiscount } = product;  // Correct destructuring
@@ -358,7 +358,7 @@ let jsonObject = JSON.parse(jsonString);
       return `${itemName}: Quantity - ${quantity}, Product Price - LKR ${priceAfterDiscount}, Total - LKR ${parseFloat(priceAfterDiscount) * parseInt(quantity)}`;
     })
     .join('\n'); // Join the details with a new line
-  
+
 
   const transporter = nodemailer.createTransport({
     service: "gmail",
@@ -380,13 +380,13 @@ let jsonObject = JSON.parse(jsonString);
     
     Best regards,
     SPK Store`
-    
+
     ,
   };
-  
+
   // product details : ${prods.itemName}, (${prods.quantity})
 
-  
+
 
   try {
     await transporter.sendMail(mailOptions);
