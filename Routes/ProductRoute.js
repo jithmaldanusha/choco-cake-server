@@ -145,27 +145,138 @@ router.post("/getProductsFilter", async (req, res) => {
   }
 });
 
-//show product
-router.post("/addproduct", async (req, res) => {
-  try {
-    // Log the request body to the console
-    console.log("Received Product Data:", req.body);
+// Add a new product
+router.post(
+  "/addProduct",
+  upload.fields([
+    { name: "itemDescription", maxCount: 3 },
+    { name: "itemsWithAccessoriesImages1", maxCount: 1 },
+    { name: "itemsWithAccessoriesImages2", maxCount: 1 },
+    { name: "itemsWithAccessoriesImages3", maxCount: 1 },
+    { name: "itemImage", maxCount: 5 },
+  ]),
+  async (req, res) => {
+    console.log(req.body);
+    try {
+      const {
+        itemID,
+        itemName,
+        itemType,
+        shortDescription,
+        topic1,
+        description1,
+        topic2,
+        description2,
+        topic3,
+        description3,
+        originalPrice,
+        priceAfterDiscount,
+        warranty,
+        quantity,
+        camera,
+        range,
+        itemBrands,
+        selectedBrand,
+        flyTime,
+        axis,
+        devices,
+        features,
+        itemDescription,
+        itemsWithAccessoriesImages3,
+        itemsWithAccessoriesImages2,
+        itemsWithAccessoriesImages1,
+        productImages,
+        // availability,
+        offers,
+      } = req.body;
+      // let imagename = req.protocol + '://' + req.get('host') + '/images/' + req.file.filename;
+      // const descImg = req.files["itemDescription"][0];
+      const accessories1 = req.files["itemsWithAccessoriesImages1"][0];
+      const accessories2 = req.files["itemsWithAccessoriesImages2"][0];
+      const accessories3 = req.files["itemsWithAccessoriesImages3"][0];
+      const files = [];
+      for (let index = 0; index < req.files["itemImage"].length; index++) {
+        files.push(
+          req.protocol +
+            "://" +
+            req.get("host") +
+            "/images/" +
+            req.files["itemImage"][index].filename
+        );
+      }
 
-    // You can also optionally send the request body back in the response
-    res.json({
-      statusCode: 200,
-      status: "OK",
-      message: "Product data received successfully",
-      data: req.body,
-    });
-  } catch (error) {
-    res.json({
-      statusCode: 500,
-      status: "Error",
-      message: error.message,
-    });
+      const filesGallery = [];
+      for (let index = 0; index < req.files['itemDescription'].length; index++) {
+        filesGallery.push(req.protocol + '://' + req.get('host') + '/images/' + req.files['itemDescription'][index].filename)
+        
+      }
+      // const image4 = req.files["itemImage"][0];
+      const newProduct = new Product({
+        itemID,
+        itemName,
+        itemType,
+        shortDescription,
+        topic1,
+        description1,
+        topic2,
+        description2,
+        topic3,
+        description3,
+        originalPrice,
+        priceAfterDiscount,
+        warranty,
+        quantity,
+        camera,
+        range,
+        itemBrands,
+        selectedBrand,
+        flyTime,
+        // preOrderAvailability,
+        axis,
+        devices,
+        features,
+        itemDescription: filesGallery,
+        itemsWithAccessoriesImages1:
+          req.protocol +
+          "://" +
+          req.get("host") +
+          "/images/" +
+          accessories1.filename,
+        itemsWithAccessoriesImages2:
+          req.protocol +
+          "://" +
+          req.get("host") +
+          "/images/" +
+          accessories2.filename,
+        itemsWithAccessoriesImages3:
+          req.protocol +
+          "://" +
+          req.get("host") +
+          "/images/" +
+          accessories3.filename,
+        itemImage: files,
+        // productImages,
+        // availability,
+        offers,
+      });
+
+      const savedProduct = await newProduct.save();
+
+      res.json({
+        statusCode: statusCode.CREATED.code,
+        status: statusCode.CREATED.status,
+        message: "Product added successfully",
+        data: savedProduct,
+      });
+    } catch (error) {
+      res.json({
+        statusCode: statusCode.INTERNAL_SERVER_ERROR.code,
+        status: statusCode.INTERNAL_SERVER_ERROR.status,
+        message: error.message,
+      });
+    }
   }
-});
+);
 
 // Update a product
 router.patch("/updateProduct/:id",  async (req, res) => {
@@ -358,137 +469,3 @@ router.delete("/deleteProduct/:id", async (req, res) => {
 
 module.exports = router;
 
-
-
-// // Add a new product
-// router.post(
-//   "/addProduct",
-//   upload.fields([
-//     { name: "itemDescription", maxCount: 3 },
-//     { name: "itemsWithAccessoriesImages1", maxCount: 1 },
-//     { name: "itemsWithAccessoriesImages2", maxCount: 1 },
-//     { name: "itemsWithAccessoriesImages3", maxCount: 1 },
-//     { name: "itemImage", maxCount: 5 },
-//   ]),
-//   async (req, res) => {
-//     console.log(req.body);
-//     try {
-//       const {
-//         itemID,
-//         itemName,
-//         itemType,
-//         shortDescription,
-//         topic1,
-//         description1,
-//         topic2,
-//         description2,
-//         topic3,
-//         description3,
-//         originalPrice,
-//         priceAfterDiscount,
-//         warranty,
-//         quantity,
-//         camera,
-//         range,
-//         itemBrands,
-//         selectedBrand,
-//         flyTime,
-//         axis,
-//         devices,
-//         features,
-//         itemDescription,
-//         itemsWithAccessoriesImages3,
-//         itemsWithAccessoriesImages2,
-//         itemsWithAccessoriesImages1,
-//         productImages,
-//         // availability,
-//         offers,
-//       } = req.body;
-//       // let imagename = req.protocol + '://' + req.get('host') + '/images/' + req.file.filename;
-//       // const descImg = req.files["itemDescription"][0];
-//       const accessories1 = req.files["itemsWithAccessoriesImages1"][0];
-//       const accessories2 = req.files["itemsWithAccessoriesImages2"][0];
-//       const accessories3 = req.files["itemsWithAccessoriesImages3"][0];
-//       const files = [];
-//       for (let index = 0; index < req.files["itemImage"].length; index++) {
-//         files.push(
-//           req.protocol +
-//             "://" +
-//             req.get("host") +
-//             "/images/" +
-//             req.files["itemImage"][index].filename
-//         );
-//       }
-
-//       const filesGallery = [];
-//       for (let index = 0; index < req.files['itemDescription'].length; index++) {
-//         filesGallery.push(req.protocol + '://' + req.get('host') + '/images/' + req.files['itemDescription'][index].filename)
-        
-//       }
-//       // const image4 = req.files["itemImage"][0];
-//       const newProduct = new Product({
-//         itemID,
-//         itemName,
-//         itemType,
-//         shortDescription,
-//         topic1,
-//         description1,
-//         topic2,
-//         description2,
-//         topic3,
-//         description3,
-//         originalPrice,
-//         priceAfterDiscount,
-//         warranty,
-//         quantity,
-//         camera,
-//         range,
-//         itemBrands,
-//         selectedBrand,
-//         flyTime,
-//         // preOrderAvailability,
-//         axis,
-//         devices,
-//         features,
-//         itemDescription: filesGallery,
-//         itemsWithAccessoriesImages1:
-//           req.protocol +
-//           "://" +
-//           req.get("host") +
-//           "/images/" +
-//           accessories1.filename,
-//         itemsWithAccessoriesImages2:
-//           req.protocol +
-//           "://" +
-//           req.get("host") +
-//           "/images/" +
-//           accessories2.filename,
-//         itemsWithAccessoriesImages3:
-//           req.protocol +
-//           "://" +
-//           req.get("host") +
-//           "/images/" +
-//           accessories3.filename,
-//         itemImage: files,
-//         // productImages,
-//         // availability,
-//         offers,
-//       });
-
-//       const savedProduct = await newProduct.save();
-
-//       res.json({
-//         statusCode: statusCode.CREATED.code,
-//         status: statusCode.CREATED.status,
-//         message: "Product added successfully",
-//         data: savedProduct,
-//       });
-//     } catch (error) {
-//       res.json({
-//         statusCode: statusCode.INTERNAL_SERVER_ERROR.code,
-//         status: statusCode.INTERNAL_SERVER_ERROR.status,
-//         message: error.message,
-//       });
-//     }
-//   }
-// );

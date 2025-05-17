@@ -28,8 +28,8 @@ const { PassThrough } = require("stream");
 
 // Create Express app
 const corsOptions = {
-  origin: "http://localhost:3000", // Replace with your frontend origin
-  credentials: true, // Allow cookies to be sent
+  origin: "http://localhost:3000",
+  credentials: true,
 };
 
 app.use(cors(corsOptions));
@@ -132,11 +132,6 @@ app.post("/send-email", async (req, res) => {
   console.log(products);
 
   // Function to transform raw product data into the expected schema format
-
-
-
-
-
   const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
@@ -159,15 +154,14 @@ app.post("/send-email", async (req, res) => {
   // Use the function to generate a random invoice number
   const invoiceNumber = generateRandomInvoiceNumber();
 
-  // PDF content with additional details
   // Generate the PDF content
   doc.fontSize(12);
 
   // SPK Store Logo
-  doc.image("images/spklogo.jpeg", 50, 45, { width: 100 }).moveDown();
+  doc.image("images/CompanyLogo.png", 50, 45, { width: 100 }).moveDown();
 
   // Store Information
-  doc.font("Helvetica-Bold").text("SPK STORE", 200, 50, { align: "right" });
+  doc.font("Helvetica-Bold").text("Choco Cakes and Backery", 200, 50, { align: "right" });
   doc.font("Helvetica").text(`Invoice # ${invoiceNumber}`, 200, 65, { align: "right" });
   doc.font("Helvetica").text(`Track Id # ${inputValue}`, 200, 80, { align: "right" });
   doc.text(`Date: ${new Date().toLocaleDateString()}`, 200, 95, { align: "right" });
@@ -180,7 +174,6 @@ app.post("/send-email", async (req, res) => {
   doc.text(`${shippingAddress}`, 50, 230);
   doc.text(`${contactNumber}`, 50, 245) // Add phone number
 
-
   // Items Table Header
   doc.moveDown().moveDown();
   doc.rect(50, 280, 500, 20).fillColor("#000000").fill();  // Black background for the header
@@ -189,10 +182,6 @@ app.post("/send-email", async (req, res) => {
   doc.text("Rate", 350, 283);
   doc.text("Amount", 450, 283);
 
-  //  const arr = JSON.parse(products);
-
-  // const flattenedProducts = arr;
-  // console.log(typeof flattenedProducts);
   let currentY = 310;  // Starting Y positio
 
   products.filter(prod => prod && prod.itemID).forEach((product) => {
@@ -206,13 +195,11 @@ app.post("/send-email", async (req, res) => {
     currentY += 30;
   });
 
-
   // Summary Section
   doc.moveDown().moveDown();
   doc.text(`Total: ${orderTotal}`, 400, 370);
   doc.text(`Delivery cost: ${deliveryCost}`, 400, 385);
   //doc.rect(395, 395, doc.widthOfString(`Balance Due: ${balanceDue}`) + 10, 20).fillAndStroke("#000", "#000").fillColor("#FFF").fontSize(12).font("Helvetica-Bold").text(`Balance Due: ${balanceDue}`, 400, 400);
-
 
   // Notes and Terms
   doc.moveDown().moveDown();
@@ -220,17 +207,16 @@ app.post("/send-email", async (req, res) => {
   doc.font("Helvetica").text("Thanks for buying our product.", 50, 465);
 
   doc.font("Helvetica-Bold").text("Terms:", 50, 490);
-  doc.font("Helvetica").text("This warranty is valid for manufacturing defects only. We do not take any responsibility for the effects caused by external factors.", 50, 505, { width: 500 });
+  doc.font("Helvetica").text("This returns are valid for manufacturing defects only. We do not take any responsibility for the effects caused by external factors.", 50, 505, { width: 500 });
 
   doc.end();
 
-  // Email options
   // Email options
   const mailOptions = {
     from: process.env.EMAIL_USER,
     to: email,
     subject: `Invoice ${inputValue}`,
-    text: `Dear ${firstName} ${lastName},\n\nPlease find attached your invoice for the recent purchase.\n\nBest regards,\nSPK Store`,
+    text: `Dear ${firstName} ${lastName},\n\nPlease find attached your invoice for the recent purchase.\n\nBest regards,\nChoco Cakes`,
     attachments: [
       {
         filename: `Invoice-${poNumber}.pdf`,
@@ -239,7 +225,6 @@ app.post("/send-email", async (req, res) => {
       },
     ],
   };
-
 
   try {
     // Send the email
@@ -266,9 +251,6 @@ app.post("/refuse-email", async (req, res) => {
   if (!email) {
     return res.status(400).json({ message: "Email is required" });
   }
-
-
-
 
   const transporter = nodemailer.createTransport({
     service: "gmail",
@@ -302,7 +284,7 @@ app.post("/refuse-email", async (req, res) => {
     For more details, contact us:
     
     WhatsApp: 0772761689
-    Email: contacspkstore@gmail.com.com
+    Email: chococake433@gmail.com
     
 
     Best regards`,
@@ -340,17 +322,6 @@ app.post("/notify-order", async (req, res) => {
 
   console.log("orderNO: " + jsonObject.orderNo);
 
-  // jsonObject.products.filter(prod => prod && prod.itemID).forEach((product) => {
-  //   const { itemName, quantity, priceAfterDiscount } = product;  // Correct destructuring
-  //   console.log("============== "+itemName + quantity + priceAfterDiscount+" ========")
-  //   // console.log(product)
-  //   // doc.fillColor("black").font("Helvetica").text(itemName, 55, currentY);
-  //   // doc.text(quantity, 250, currentY);
-  //   // doc.text(priceAfterDiscount, 350, currentY);
-  //   // doc.text(`${parseFloat(priceAfterDiscount) * parseInt(quantity)}`, 450, currentY);
-  //   // currentY += 30;
-  // });
-
   const productDetails = jsonObject.products
     .filter(prod => prod && prod.itemID)
     .map(product => {
@@ -370,7 +341,7 @@ app.post("/notify-order", async (req, res) => {
 
   const mailOptions = {
     from: process.env.EMAIL_USER,
-    to: 'contacspkstore@gmail.com',//admin's email
+    to: process.env.EMAIL_USER,//admin's email
     subject: subject,
     text: `Dear Admin,
 
@@ -379,14 +350,12 @@ app.post("/notify-order", async (req, res) => {
     product Details: ${productDetails}
     
     Best regards,
-    SPK Store`
+    Choco-Cakes`
 
     ,
   };
 
   // product details : ${prods.itemName}, (${prods.quantity})
-
-
 
   try {
     await transporter.sendMail(mailOptions);
